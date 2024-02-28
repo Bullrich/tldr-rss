@@ -1,7 +1,7 @@
 {
-  "name": "parity-action-template",
+  "name": "tldr-rss",
   "version": "0.0.1",
-  "description": "GitHub action template for Parity",
+  "description": "Converts TLDR feed into a RSS with all the articles",
   "main": "src/index.ts",
   "scripts": {
     "start": "node dist",
