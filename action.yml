@@ -1,0 +1,17 @@
+name: "Example Action"
+description: "This values need to be changed"
+author: Bullrich
+branding:
+  icon: copy
+  color: yellow
+inputs:
+  GITHUB_TOKEN:
+    required: true
+    description: The token to access the repo
+outputs:
+  repo:
+    description: 'The name of the repo in owner/repo pattern'
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'

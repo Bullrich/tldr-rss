@@ -1,0 +1,39 @@
+name: Continuous testing
+
+on: 
+  pull_request:
+  push:
+    branches: ["main"]
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        command: [lint, build, test]
+    runs-on: ubuntu-latest
+    name: running ${{ matrix.command }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Cache node modules
+        id: cache-npm
+        uses: actions/cache@v4
+        env:
+          cache-name: cache-node-modules
+        with:
+          # npm cache files are stored in `~/.npm` on Linux/macOS
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: ${{ runner.os }}-build-${{ env.cache-name }}-
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      - run: yarn run ${{ matrix.command }}
+
+  conclude:
+    runs-on: ubuntu-latest
+    name: All tests passed
+    needs: [test]
+    steps:
+      - run: echo '### Good job! All the tests passed 🚀' >> $GITHUB_STEP_SUMMARY

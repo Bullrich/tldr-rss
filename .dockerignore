@@ -1,0 +1,8 @@
+/node_modules
+/dist
+
+Dockerfile
+.idea
+.DS_Store
+
+.vscode/
