@@ -37,7 +37,7 @@ function buildFeed(posts: Post[]) {
   return feedItems;
 }
 
-export const writeRssFeed = async (posts: Post[]) => {
+export const writeRssFeed = async (posts: Post[]): Promise<void> => {
   logger.info("Creating feed 📚");
   const feedObject = {
     rss: [

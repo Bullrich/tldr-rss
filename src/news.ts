@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import axios from "axios";
 import { JSDOM } from "jsdom";
 import Parser from "rss-parser";
@@ -13,8 +14,8 @@ export const getRSSFeed = async (feed: string) => {
 
 export const fetchNews = async (url: string): Promise<News[]> => {
   logger.info(`Downloading site from ${url}`);
-  const content = await axios.get(url);
-  const site = new JSDOM(content.data);
+  const siteFetch = await axios.get(url);
+  const site = new JSDOM(siteFetch.data as string);
   const doc = site.window.document;
 
   const news: News[] = [];
