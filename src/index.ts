@@ -40,7 +40,7 @@ const summarizeNews = async (news: NewsWithDate[]): Promise<void> => {
     .addHeading(`RSS news for ${new Date().toDateString()}`, 1)
     .addTable([
       [{ data: "Source", header: true }],
-      feeds.flatMap((feed) => [`<a href=${feed}>${feed}</a>`]),
+      ...feeds.map((feed) => [`<a href=${feed}>${feed}</a>`]),
     ])
     .addEOL();
   for (const { title, content, date, link } of news) {

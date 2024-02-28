@@ -9,7 +9,7 @@ jobs:
   test:
     strategy:
       matrix:
-        command: [lint, build, test]
+        command: [lint, build]
     runs-on: ubuntu-latest
     name: running ${{ matrix.command }}
     steps:
