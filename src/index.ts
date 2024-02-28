@@ -1,32 +1,36 @@
-import { getInput, info, setOutput } from "@actions/core";
-import { context, getOctokit } from "@actions/github";
-import { Context } from "@actions/github/lib/context";
-import { PullRequest } from "@octokit/webhooks-types";
+import { setFailed } from "@actions/core";
 
-import { PullRequestApi } from "./github/pullRequest";
-import { generateCoreLogger } from "./util";
+import { fetchNews, getRSSFeed } from "./news";
+import { writeRssFeed } from "./rss";
+import { News } from "./types";
+import { logger } from "./util";
 
-const getRepo = (ctx: Context) => {
-  let repo = getInput("repo", { required: false });
-  if (!repo) {
-    repo = ctx.repo.repo;
+const feeds: string[] = [
+  "https://tldr.tech/api/rss/tech",
+  "https://tldr.tech/api/rss/ai",
+  "https://tldr.tech/api/rss/crypto",
+];
+
+const fetchFeeds = async () => {
+  const dateWithNews: (News & { date: string })[] = [];
+  for (const feed in feeds) {
+    const rssNews = await getRSSFeed(feed);
+    for (const item of rssNews.items) {
+      if (item.link && item.isoDate) {
+        logger.info(`Downloading news from ${item.link} for ${item.isoDate}`);
+        const news = await fetchNews(item.link);
+        logger.debug(JSON.stringify(news));
+        for (const currentNews of news) {
+          dateWithNews.push({ ...currentNews, date: item.isoDate });
+        }
+      }
+    }
   }
 
-  let owner = getInput("owner", { required: false });
-  if (!owner) {
-    owner = ctx.repo.owner;
-  }
-
-  return { repo, owner };
+  logger.debug(`All news: ${JSON.stringify(dateWithNews)}`);
+  await writeRssFeed(dateWithNews);
 };
 
-const repo = getRepo(context);
-
-setOutput("repo", `${repo.owner}/${repo.repo}`);
-
-if (context.payload.pull_request) {
-  const token = getInput("GITHUB_TOKEN", { required: true });
-  const api = new PullRequestApi(getOctokit(token), generateCoreLogger());
-  const author = api.getPrAuthor(context.payload.pull_request as PullRequest);
-  info("Author of the PR is " + author);
-}
+fetchFeeds()
+  .then(() => logger.info("Finished generating feed"))
+  .catch(setFailed);

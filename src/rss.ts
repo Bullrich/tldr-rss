@@ -1,6 +1,8 @@
 import { writeFile } from "fs/promises";
 import xml from "xml";
 
+import { logger } from "./util";
+
 type Post = { title: string; date: string; content: string; link: string };
 
 function buildFeed(posts: Post[]) {
@@ -36,7 +38,7 @@ function buildFeed(posts: Post[]) {
 }
 
 export const writeRssFeed = async (posts: Post[]) => {
-  console.log("creating feed");
+  logger.info("Creating feed 📚");
   const feedObject = {
     rss: [
       {

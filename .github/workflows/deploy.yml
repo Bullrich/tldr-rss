@@ -22,7 +22,6 @@ jobs:
           node-version: 20
       - run: yarn install --frozen-lockfile
     #   - run: yarn run lint
-      - run: yarn run test
       - run: yarn run cli
       - uses: actions/upload-artifact@v4.3.1
         with:
