@@ -13,7 +13,8 @@ const feeds: string[] = [
 
 const fetchFeeds = async () => {
   const dateWithNews: (News & { date: string })[] = [];
-  for (const feed in feeds) {
+  for (const feed of feeds) {
+    logger.debug(`Searching for feed for ${feed}`);
     const rssNews = await getRSSFeed(feed);
     for (const item of rssNews.items) {
       if (item.link && item.isoDate) {
