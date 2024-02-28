@@ -1,4 +1,4 @@
-import { setFailed } from "@actions/core";
+import { setFailed, summary } from "@actions/core";
 
 import { fetchNews, getRSSFeed } from "./news";
 import { writeRssFeed } from "./rss";
@@ -11,8 +11,10 @@ const feeds: string[] = [
   "https://tldr.tech/api/rss/crypto",
 ];
 
+type NewsWithDate = News & { date: string };
+
 const fetchFeeds = async () => {
-  const dateWithNews: (News & { date: string })[] = [];
+  const dateWithNews: NewsWithDate[] = [];
   for (const feed of feeds) {
     logger.debug(`Searching for feed for ${feed}`);
     const rssNews = await getRSSFeed(feed);
@@ -30,8 +32,28 @@ const fetchFeeds = async () => {
 
   logger.debug(`All news: ${JSON.stringify(dateWithNews)}`);
   await writeRssFeed(dateWithNews);
+  return dateWithNews;
 };
 
-fetchFeeds()
-  .then(() => logger.info("Finished generating feed"))
-  .catch(setFailed);
+const summarizeNews = async (news: NewsWithDate[]): Promise<void> => {
+  let text = summary
+    .addHeading(`RSS news for ${new Date().toDateString()}`, 1)
+    .addTable([
+      [{ data: "Source", header: true }],
+      feeds.flatMap((feed) => [`<a href=${feed}>${feed}</a>`]),
+    ])
+    .addEOL();
+  for (const { title, content, date, link } of news) {
+    text = text
+      .addHeading(`<a href=${link}>${title}</a>`, 3)
+      .addEOL()
+      .addHeading(new Date(date).toDateString(), 5)
+      .addEOL()
+      .addQuote(content)
+      .addEOL();
+  }
+
+  await text.write();
+};
+
+fetchFeeds().then(summarizeNews).catch(setFailed);
