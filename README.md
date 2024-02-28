@@ -1,9 +1,9 @@
-# Parity GitHub Action template
+# TLDR RSS
 
-Template used to generate GitHub Actions.
+[![Update RSS](https://github.com/Bullrich/tldr-rss/actions/workflows/deploy.yml/badge.svg)](https://github.com/Bullrich/tldr-rss/actions/workflows/deploy.yml)
 
-## To start
+Recollection of [TLDR](https://tldr.tech) feeds. Unified into a single RSS feed.
 
-- Remember to modify the `action.yml` file to have your required attributes and details. 
- - You can use [GitHub Action Brandings cheatsheet](https://github.com/haya14busa/github-action-brandings) to set the style of the action.
-- Remember to modify the name in the `package.json`.
+Why?
+
+Because `TLDR` feed publishes only one article per day, but inside this article it has many articles (around 12). I created this tool to access all of them from my RSS reader instead of having to go into each single one individually.

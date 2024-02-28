@@ -1,12 +1,13 @@
 {
-  "name": "parity-action-template",
+  "name": "tldr-rss",
   "version": "0.0.1",
-  "description": "GitHub action template for Parity",
+  "description": "Converts TLDR feed into a RSS with all the articles",
   "main": "src/index.ts",
   "scripts": {
     "start": "node dist",
     "build": "ncc build --license LICENSE",
     "test": "jest",
+    "cli": "ncc build src/cli.ts -o .cli && node .cli",
     "fix": "eslint --fix 'src/**/*'",
     "lint": "eslint 'src/**/*'"
   },
@@ -23,11 +24,17 @@
   "dependencies": {
     "@actions/core": "^1.10.1",
     "@actions/github": "^5.1.1",
-    "@octokit/webhooks-types": "^7.3.1"
+    "@octokit/webhooks-types": "^7.3.1",
+    "axios": "^1.6.7",
+    "jsdom": "^24.0.0",
+    "rss-parser": "^3.13.0",
+    "xml": "^1.0.1"
   },
   "devDependencies": {
     "@eng-automation/js-style": "^2.3.0",
     "@types/jest": "^29.5.5",
+    "@types/jsdom": "^21.1.6",
+    "@types/xml": "^1.0.11",
     "@vercel/ncc": "^0.38.0",
     "jest": "^29.7.0",
     "ts-jest": "^29.1.1",

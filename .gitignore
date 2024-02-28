@@ -1,5 +1,6 @@
 /node_modules
 /dist
+.cli
 
 .DS_Store
 *-error.log
@@ -9,3 +10,5 @@
 !.vscode/extensions.json
 !.vscode/settings.json
 .idea
+
+site/*.rss
