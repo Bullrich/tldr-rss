@@ -1,6 +1,7 @@
 import axios from "axios";
 import { JSDOM } from "jsdom";
 import Parser from "rss-parser";
+
 import { writeRssFeed } from "./rss";
 
 const rssFeed = "https://tldr.tech/api/rss/tech";
@@ -43,21 +44,21 @@ const fetchNews = async (url: string): Promise<News[]> => {
 const run = async () => {
   const rssNews = await getRSSFeed();
   const link = "https://tldr.tech/tech/2024-02-05";
-  const dateWithNews:  (News & {date:string})[] = [];
+  const dateWithNews: (News & { date: string })[] = [];
   for (const item of rssNews.items) {
     if (item.link && item.isoDate) {
       console.log("Downloading news from %s", item.isoDate, item.link);
       const news = await fetchNews(item.link);
       console.log(news);
       for (const currentNews of news) {
-          dateWithNews.push({...currentNews, date:item.isoDate});
+        dateWithNews.push({ ...currentNews, date: item.isoDate });
       }
       break;
     }
   }
 
   console.log("All news", dateWithNews);
-  await writeRssFeed(dateWithNews)
+  await writeRssFeed(dateWithNews);
 };
 
 run();
