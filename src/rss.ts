@@ -1,4 +1,4 @@
-import { writeFile, mkdir } from "fs/promises";
+import { writeFile } from "fs/promises";
 import xml from "xml";
 
 type Post = { title: string; date: string; content: string; link: string };
@@ -66,6 +66,15 @@ export const writeRssFeed = async (posts: Post[]) => {
           },
           { description: "TLDR RSS Feed" },
           { language: "en-US" },
+          {
+            image: [
+              {
+                url: "https://tldr.tech/tldrsquare.png",
+                title: "TLDR RSS Feed",
+                link: "https://tldr.tech",
+              },
+            ],
+          },
           // todo: add the feed items here
           ...buildFeed(posts),
         ],
@@ -75,6 +84,5 @@ export const writeRssFeed = async (posts: Post[]) => {
 
   const feed = '<?xml version="1.0" encoding="UTF-8"?>' + xml(feedObject);
 
-  await mkdir("./rss");
-  await writeFile("./rss/feed.rss", feed, "utf8");
+  await writeFile("./site/feed.rss", feed, "utf8");
 };
