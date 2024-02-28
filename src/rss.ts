@@ -52,8 +52,7 @@ export const writeRssFeed = async (posts: Post[]): Promise<void> => {
           {
             "atom:link": {
               _attr: {
-                // TODO: Change this
-                href: "YOUR-WEBSITE/feed.rss",
+                href: "https://bullrich.dev/tldr-rss/feed.rss",
                 rel: "self",
                 type: "application/rss+xml",
               },
@@ -63,8 +62,7 @@ export const writeRssFeed = async (posts: Post[]): Promise<void> => {
             title: "TLDR RSS Feed",
           },
           {
-            // TODO: Change this
-            link: "YOUR-WEBSITE/",
+            link: "https://bullrich.dev/tldr-rss/",
           },
           { description: "TLDR RSS Feed" },
           { language: "en-US" },
@@ -77,7 +75,6 @@ export const writeRssFeed = async (posts: Post[]): Promise<void> => {
               },
             ],
           },
-          // todo: add the feed items here
           ...buildFeed(posts),
         ],
       },
