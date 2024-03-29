@@ -31,6 +31,7 @@ jobs:
           name: rss
           path: ./site
           if-no-files-found: error
+          retention-days: 2
   deploy-to-github-pages:
     runs-on: ubuntu-latest
     name: Deploy RSS
