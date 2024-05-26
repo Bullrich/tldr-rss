@@ -30,13 +30,15 @@ const fetchFeeds = async (): Promise<NewsWithDate[]> => {
       if (item.link && item.isoDate) {
         logger.info(`Downloading news from ${item.link} for ${item.isoDate}`);
         const news = await fetchNews(item.link);
-        logger.debug(JSON.stringify(news));
+        logger.debug(`Downloaded ${news.length} articles`);
         for (const currentNews of news) {
+          logger.debug(JSON.stringify(currentNews));
           feedNews.push({ ...currentNews, date: item.isoDate });
         }
       }
     }
-    await writeRssFeed(feedName, dateWithNews);
+
+    await writeRssFeed(feedName, feedNews);
 
     dateWithNews.push(...feedNews);
   }
