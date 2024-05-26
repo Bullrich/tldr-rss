@@ -37,7 +37,10 @@ function buildFeed(posts: Post[]) {
   return feedItems;
 }
 
-export const writeRssFeed = async (posts: Post[]): Promise<void> => {
+export const writeRssFeed = async (
+  feedName: string,
+  posts: Post[],
+): Promise<void> => {
   logger.info("Creating feed 📚");
   const feedObject = {
     rss: [
@@ -52,7 +55,7 @@ export const writeRssFeed = async (posts: Post[]): Promise<void> => {
           {
             "atom:link": {
               _attr: {
-                href: "https://bullrich.dev/tldr-rss/feed.rss",
+                href: `https://bullrich.dev/tldr-rss/${feedName}.rss`,
                 rel: "self",
                 type: "application/rss+xml",
               },
@@ -83,5 +86,5 @@ export const writeRssFeed = async (posts: Post[]): Promise<void> => {
 
   const feed = '<?xml version="1.0" encoding="UTF-8"?>' + xml(feedObject);
 
-  await writeFile("./site/feed.rss", feed, "utf8");
+  await writeFile(`./site/${feedName}.rss`, feed, "utf8");
 };
