@@ -41,7 +41,11 @@ export const writeRssFeed = async (
   feedName: string,
   posts: Post[],
 ): Promise<void> => {
-  logger.info("Creating feed 📚");
+  logger.info(`Creating feed for ${feedName} 📚`);
+
+  if (posts.length === 0) {
+    throw new Error(`No posts found for ${feedName}`);
+  }
   const feedObject = {
     rss: [
       {
@@ -62,7 +66,7 @@ export const writeRssFeed = async (
             },
           },
           {
-            title: "TLDR RSS Feed",
+            title: `TLDR ${feedName.toLocaleUpperCase()} Feed`,
           },
           {
             link: "https://bullrich.dev/tldr-rss/",
