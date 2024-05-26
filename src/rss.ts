@@ -8,7 +8,7 @@ type Post = { title: string; date: string; content: string; link: string };
 function buildFeed(posts: Post[]) {
   const sortedPosts = posts.sort(
     (first, second) =>
-      new Date(second.date).getTime() - new Date(first.date).getTime()
+      new Date(second.date).getTime() - new Date(first.date).getTime(),
   );
 
   const feedItems = [];
@@ -31,7 +31,7 @@ function buildFeed(posts: Post[]) {
           },
         ],
       };
-    })
+    }),
   );
 
   return feedItems;
@@ -39,7 +39,7 @@ function buildFeed(posts: Post[]) {
 
 export const writeRssFeed = async (
   feedName: string,
-  posts: Post[]
+  posts: Post[],
 ): Promise<void> => {
   logger.info("Creating feed 📚");
   const feedObject = {
