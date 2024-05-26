@@ -8,7 +8,14 @@ import { logger } from "./util";
 const RSS_BASE_URL = "https://tldr.tech/api/rss";
 
 // Add rss feed to create a new one
-const feeds: string[] = ["tech", "ai", "crypto"];
+const feeds: string[] = [
+  "tech",
+  "ai",
+  "crypto",
+  "founders",
+  "design",
+  "devops",
+];
 
 type NewsWithDate = News & { date: string };
 
