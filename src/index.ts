@@ -15,6 +15,7 @@ const feeds: string[] = [
   "founders",
   "design",
   "devops",
+  "data",
 ];
 
 type NewsWithDate = News & { date: string };
