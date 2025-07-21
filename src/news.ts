@@ -14,31 +14,38 @@ export const getRSSFeed = async (feed: string) => {
 
 export const fetchNews = async (url: string): Promise<News[]> => {
   logger.info(`Downloading site from ${url}`);
-  const siteFetch = await axios.get(url);
-  const site = new JSDOM(siteFetch.data as string);
-  const doc = site.window.document;
+  try {
+    const siteFetch = await axios.get(url);
+    const site = new JSDOM(siteFetch.data as string);
+    const doc = site.window.document;
 
-  const news: News[] = [];
+    const news: News[] = [];
 
-  // We get all the headers
-  const headers = doc.querySelectorAll("h3");
-  logger.info(`Found ${headers.length} headers. Parsing them`);
-  for (const header of headers.values()) {
-    const title = header.textContent;
-    const link = header.parentElement?.getAttribute("href");
-    const content =
-      header.parentElement?.parentElement?.querySelector("div")?.textContent;
-    if (!title || !link || !content) {
-      logger.debug(
-        `Skipping null elements: ${title ?? "title"} ${url} ${
-          content ?? "content"
-        }`,
-      );
-      continue;
+    // We get all the headers
+    const headers = doc.querySelectorAll("h3");
+    logger.info(`Found ${headers.length} headers. Parsing them`);
+    for (const header of headers.values()) {
+      const title = header.textContent;
+      const link = header.parentElement?.getAttribute("href");
+      const content =
+        header.parentElement?.parentElement?.querySelector("div")?.textContent;
+      if (!title || !link || !content) {
+        logger.debug(
+          `Skipping null elements: ${title ?? "title"} ${url} ${
+            content ?? "content"
+          }`,
+        );
+        continue;
+      }
+
+      news.push({ title, link, content });
     }
 
-    news.push({ title, link, content });
+    return news;
+  } catch (error) {
+    logger.info(
+      `Failed to fetch news from ${url}: ${error instanceof Error ? error.message : String(error)}`,
+    );
+    return [];
   }
-
-  return news;
 };
