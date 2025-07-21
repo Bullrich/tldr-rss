@@ -7,3 +7,14 @@ Recollection of [TLDR](https://tldr.tech) feeds. Unified into a single RSS feed.
 Why?
 
 Because `TLDR` feed publishes only one article per day, but inside this article it has many articles (around 12). I created this tool to access all of them from my RSS reader instead of having to go into each single one individually.
+
+## Configuration
+
+### Environment Variables
+
+- `MAX_DAYS` (optional): Maximum number of days in the past to fetch articles from. Defaults to 10 if not set.
+
+Example:
+```bash
+MAX_DAYS=7 yarn start  # Fetch articles from the last 7 days
+```
