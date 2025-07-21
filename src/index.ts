@@ -7,6 +7,9 @@ import { logger } from "./util";
 
 const RSS_BASE_URL = "https://tldr.tech/api/rss";
 
+// Maximum number of days to fetch, configurable via environment variable
+const MAX_DAYS = parseInt(process.env.MAX_DAYS || "10", 10);
+
 // Add rss feed to create a new one
 const feeds: string[] = [
   "tech",
@@ -22,12 +25,31 @@ type NewsWithDate = News & { date: string };
 
 const fetchFeeds = async (): Promise<NewsWithDate[]> => {
   const dateWithNews: NewsWithDate[] = [];
+  const cutoffDate = new Date();
+  cutoffDate.setDate(cutoffDate.getDate() - MAX_DAYS);
+
+  logger.info(
+    `Fetching news from the last ${MAX_DAYS} days (since ${cutoffDate.toISOString()})`,
+  );
+
   for (const feedName of feeds) {
     const feed = `${RSS_BASE_URL}/${feedName}`;
     logger.debug(`Searching for feed for ${feed}`);
     const feedNews: NewsWithDate[] = [];
     const rssNews = await getRSSFeed(feed);
-    for (const item of rssNews.items) {
+
+    // Filter items by date before processing
+    const recentItems = rssNews.items.filter((item) => {
+      if (!item.isoDate) return false;
+      const itemDate = new Date(item.isoDate);
+      return itemDate >= cutoffDate;
+    });
+
+    logger.info(
+      `Found ${rssNews.items.length} total items, ${recentItems.length} within the last ${MAX_DAYS} days`,
+    );
+
+    for (const item of recentItems) {
       if (item.link && item.isoDate) {
         logger.info(`Downloading news from ${item.link} for ${item.isoDate}`);
         const news = await fetchNews(item.link);
