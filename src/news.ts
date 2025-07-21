@@ -6,10 +6,56 @@ import Parser from "rss-parser";
 import { News } from "./types";
 import { logger } from "./util";
 
-export const getRSSFeed = async (feed: string) => {
+export const getRSSFeed = async (
+  feed: string,
+): Promise<Parser.Output<Record<string, unknown>>> => {
   const parser = new Parser();
   logger.info(`Fetching feed for ${feed}`);
-  return await parser.parseURL(feed);
+
+  const maxRetries = 2; // 2 retries + 1 initial attempt = 3 total attempts
+  let attemptCount = 0;
+
+  while (attemptCount <= maxRetries) {
+    try {
+      return await parser.parseURL(feed);
+    } catch (error: unknown) {
+      attemptCount++;
+
+      // Check if this is a 429 error
+      const errorWithResponse = error as {
+        response?: { status?: number; headers?: Record<string, string> };
+      };
+      const is429Error = errorWithResponse?.response?.status === 429;
+
+      if (!is429Error || attemptCount > maxRetries) {
+        // If it's not a 429 error, or we've exhausted all retries, throw the error
+        if (is429Error && attemptCount > maxRetries) {
+          logger.info(
+            `Failed to fetch RSS feed for ${feed} after ${maxRetries + 1} attempts due to rate limiting`,
+          );
+        }
+        throw error;
+      }
+
+      // Extract retry delay from Retry-After header or default to 10 seconds
+      const retryAfter = errorWithResponse.response?.headers?.["retry-after"];
+      const delaySeconds =
+        retryAfter && !isNaN(parseInt(retryAfter, 10))
+          ? parseInt(retryAfter, 10)
+          : 10;
+      const delayMs = delaySeconds * 1000;
+
+      logger.info(
+        `Rate limited (429) for feed ${feed}. Retrying in ${delaySeconds} seconds (attempt ${attemptCount}/${maxRetries + 1})`,
+      );
+
+      // Wait before retrying
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
+    }
+  }
+
+  // This should never be reached, but TypeScript needs this to understand the function always returns or throws
+  throw new Error("Unexpected end of retry loop");
 };
 
 export const fetchNews = async (url: string): Promise<News[]> => {
