@@ -9,7 +9,9 @@ describe("fetchNews", () => {
 
   it("should return empty array when URL is invalid", async () => {
     // Test with an invalid URL
-    const result = await fetchNews("https://invalid-url-that-does-not-exist.invalid");
+    const result = await fetchNews(
+      "https://invalid-url-that-does-not-exist.invalid",
+    );
     expect(result).toEqual([]);
   });
 });
