@@ -1,5 +1,6 @@
 import { setFailed, summary } from "@actions/core";
 
+import { writeHtmlFeed } from "./html";
 import { fetchNews, getRSSFeed } from "./news";
 import { writeRssFeed } from "./rss";
 import { News } from "./types";
@@ -62,6 +63,11 @@ const fetchFeeds = async (): Promise<NewsWithDate[]> => {
     }
 
     await writeRssFeed(feedName, feedNews);
+
+    // Generate HTML page for tech feed only
+    if (feedName === "tech") {
+      await writeHtmlFeed(feedName, feedNews);
+    }
 
     dateWithNews.push(...feedNews);
   }
