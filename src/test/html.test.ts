@@ -122,9 +122,29 @@ describe("HTML Feed Generation", () => {
     expect(content).toContain("&amp;");
     expect(content).toContain("&quot;");
 
-    // Should escape URL attributes properly
+    // Should escape URL attributes properly (including single quotes)
     expect(content).toContain(
       'href="https://example.com/xss?param=value&amp;other=&quot;test&quot;"',
+    );
+  });
+
+  it("should escape single quotes in URLs", async () => {
+    const postsWithSingleQuotes = [
+      {
+        title: "Test Article",
+        link: "https://example.com/article?name=O'Brien",
+        content: "Test content",
+        date: new Date("2024-01-15T10:00:00Z").toISOString(),
+      },
+    ];
+
+    await writeHtmlFeed("test", postsWithSingleQuotes);
+
+    const content = await readFile("./site/test.html", "utf8");
+
+    // Single quotes should be escaped in href attributes
+    expect(content).toContain(
+      'href="https://example.com/article?name=O&#039;Brien"',
     );
   });
 

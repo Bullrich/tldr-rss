@@ -122,5 +122,8 @@ function escapeHtml(text: string): string {
 function escapeHtmlAttr(text: string): string {
   // For attributes, we need to escape quotes and ampersands
   // Other HTML entities are fine in attribute values
-  return text.replace(/&/g, "&amp;").replace(/"/g, "&quot;");
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
