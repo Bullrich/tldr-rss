@@ -106,7 +106,7 @@ describe("HTML Feed Generation", () => {
     const postsWithHtml = [
       {
         title: "Article with <script>alert('XSS')</script>",
-        link: "https://example.com/xss",
+        link: 'https://example.com/xss?param=value&other="test"',
         content: "Content with & < > \" ' characters",
         date: new Date("2024-01-15T10:00:00Z").toISOString(),
       },
@@ -116,11 +116,16 @@ describe("HTML Feed Generation", () => {
 
     const content = await readFile("./site/test.html", "utf8");
 
-    // Should escape dangerous characters
+    // Should escape dangerous characters in content
     expect(content).not.toContain("<script>");
     expect(content).toContain("&lt;script&gt;");
     expect(content).toContain("&amp;");
     expect(content).toContain("&quot;");
+
+    // Should escape URL attributes properly
+    expect(content).toContain(
+      'href="https://example.com/xss?param=value&amp;other=&quot;test&quot;"',
+    );
   });
 
   it("should throw error if no posts are provided", async () => {

@@ -85,7 +85,7 @@ export const writeHtmlFeed = async (
 ${sortedPosts
   .map(
     (post) => `        <article>
-            <h2><a href="${escapeHtml(post.link)}">${escapeHtml(post.title)}</a></h2>
+            <h2><a href="${escapeHtmlAttr(post.link)}">${escapeHtml(post.title)}</a></h2>
             <time datetime="${new Date(post.date).toISOString()}">${new Date(post.date).toISOString()}</time>
             <p>${escapeHtml(post.content)}</p>
         </article>`,
@@ -113,4 +113,14 @@ function escapeHtml(text: string): string {
     "'": "&#039;",
   };
   return text.replace(/[&<>"']/g, (m) => map[m]);
+}
+
+/**
+ * Escapes HTML attribute values (for href, src, etc.)
+ * URLs need to escape HTML entities but preserve URL structure
+ */
+function escapeHtmlAttr(text: string): string {
+  // For attributes, we need to escape quotes and ampersands
+  // Other HTML entities are fine in attribute values
+  return text.replace(/&/g, "&amp;").replace(/"/g, "&quot;");
 }
