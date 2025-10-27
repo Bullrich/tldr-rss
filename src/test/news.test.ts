@@ -95,6 +95,31 @@ describe("getRSSFeed", () => {
     jest.restoreAllMocks();
   }, 10000); // 10 second timeout for this test
 
+  it("should succeed after failing 4 times and succeeding on 5th attempt", async () => {
+    const error429 = new Error("Too Many Requests") as Error & {
+      response: { status: number; headers: Record<string, string> };
+    };
+    error429.response = {
+      status: 429,
+      headers: { "retry-after": "1" },
+    };
+
+    const mockParser = jest
+      .spyOn(Parser.prototype, "parseURL")
+      .mockRejectedValueOnce(error429)
+      .mockRejectedValueOnce(error429)
+      .mockRejectedValueOnce(error429)
+      .mockRejectedValueOnce(error429)
+      .mockResolvedValueOnce({ items: [{ title: "Success on 5th try" }] });
+
+    const result = await getRSSFeed("https://example.com/rss");
+
+    expect(result).toEqual({ items: [{ title: "Success on 5th try" }] });
+    expect(mockParser).toHaveBeenCalledTimes(5);
+
+    jest.restoreAllMocks();
+  }, 10000); // 10 second timeout for this test
+
   it("should not retry on non-429 errors", async () => {
     const error404 = new Error("Not Found") as Error & {
       response: { status: number };
