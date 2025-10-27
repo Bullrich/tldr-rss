@@ -12,7 +12,7 @@ export const getRSSFeed = async (
   const parser = new Parser();
   logger.info(`Fetching feed for ${feed}`);
 
-  const maxRetries = 2; // 2 retries + 1 initial attempt = 3 total attempts
+  const maxRetries = 6; // 6 retries + 1 initial attempt = 7 total attempts
   let attemptCount = 0;
 
   while (attemptCount <= maxRetries) {
@@ -30,22 +30,22 @@ export const getRSSFeed = async (
       if (!is429Error || attemptCount > maxRetries) {
         // If it's not a 429 error, or we've exhausted all retries, throw the error
         if (is429Error && attemptCount > maxRetries) {
-          logger.info(
+          logger.warn(
             `Failed to fetch RSS feed for ${feed} after ${maxRetries + 1} attempts due to rate limiting`,
           );
         }
         throw error;
       }
 
-      // Extract retry delay from Retry-After header or default to 10 seconds
+      // Extract retry delay from Retry-After header or default to 30 seconds
       const retryAfter = errorWithResponse.response?.headers?.["retry-after"];
       const delaySeconds =
         retryAfter && !isNaN(parseInt(retryAfter, 10))
           ? parseInt(retryAfter, 10)
-          : 10;
+          : 30;
       const delayMs = delaySeconds * 1000;
 
-      logger.info(
+      logger.warn(
         `Rate limited (429) for feed ${feed}. Retrying in ${delaySeconds} seconds (attempt ${attemptCount}/${maxRetries + 1})`,
       );
 
