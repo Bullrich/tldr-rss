@@ -178,4 +178,74 @@ describe("getRSSFeed", () => {
     setTimeoutSpy.mockRestore();
     jest.restoreAllMocks();
   });
+
+  it("should retry on 429 errors with message only (no response object)", async () => {
+    // This simulates how rss-parser throws errors: just Error("Status code 429")
+    const error429 = new Error("Status code 429");
+
+    // Mock setTimeout to avoid waiting
+    const setTimeoutSpy = jest
+      .spyOn(global, "setTimeout")
+      .mockImplementation((callback) => {
+        // Call callback immediately for test
+        (callback as () => void)();
+        const mockTimeout: NodeJS.Timeout = {
+          ref: () => mockTimeout,
+          unref: () => mockTimeout,
+          hasRef: () => true,
+          refresh: () => mockTimeout,
+          [Symbol.toPrimitive]: () => 0,
+          [Symbol.dispose]: () => {},
+        };
+        return mockTimeout;
+      });
+
+    const mockParser = jest
+      .spyOn(Parser.prototype, "parseURL")
+      .mockRejectedValueOnce(error429)
+      .mockRejectedValueOnce(error429)
+      .mockResolvedValueOnce({ items: [{ title: "Success after retries" }] });
+
+    const result = await getRSSFeed("https://example.com/rss");
+
+    expect(result).toEqual({ items: [{ title: "Success after retries" }] });
+    expect(mockParser).toHaveBeenCalledTimes(3);
+
+    setTimeoutSpy.mockRestore();
+    jest.restoreAllMocks();
+  });
+
+  it("should fail after 7 attempts for 429 errors with message only", async () => {
+    // This simulates how rss-parser throws errors: just Error("Status code 429")
+    const error429 = new Error("Status code 429");
+
+    // Mock setTimeout to avoid waiting
+    const setTimeoutSpy = jest
+      .spyOn(global, "setTimeout")
+      .mockImplementation((callback) => {
+        // Call callback immediately for test
+        (callback as () => void)();
+        const mockTimeout: NodeJS.Timeout = {
+          ref: () => mockTimeout,
+          unref: () => mockTimeout,
+          hasRef: () => true,
+          refresh: () => mockTimeout,
+          [Symbol.toPrimitive]: () => 0,
+          [Symbol.dispose]: () => {},
+        };
+        return mockTimeout;
+      });
+
+    const mockParser = jest
+      .spyOn(Parser.prototype, "parseURL")
+      .mockRejectedValue(error429);
+
+    await expect(getRSSFeed("https://example.com/rss")).rejects.toThrow(
+      "Status code 429",
+    );
+    expect(mockParser).toHaveBeenCalledTimes(7);
+
+    setTimeoutSpy.mockRestore();
+    jest.restoreAllMocks();
+  });
 });

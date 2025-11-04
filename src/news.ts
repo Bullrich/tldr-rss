@@ -22,10 +22,14 @@ export const getRSSFeed = async (
       attemptCount++;
 
       // Check if this is a 429 error
+      // Some libraries throw errors with a response object, others just with a message
       const errorWithResponse = error as {
         response?: { status?: number; headers?: Record<string, string> };
+        message?: string;
       };
-      const is429Error = errorWithResponse?.response?.status === 429;
+      const is429Error =
+        errorWithResponse?.response?.status === 429 ||
+        (error instanceof Error && error.message.includes("Status code 429"));
 
       if (!is429Error || attemptCount > maxRetries) {
         // If it's not a 429 error, or we've exhausted all retries, throw the error
