@@ -2,6 +2,23 @@ import Parser from "rss-parser";
 
 import { fetchNews, getRSSFeed } from "../news";
 
+// Helper function to create a setTimeout mock that executes immediately
+function createMockSetTimeout(): jest.SpyInstance {
+  return jest.spyOn(global, "setTimeout").mockImplementation((callback) => {
+    // Call callback immediately for test
+    (callback as () => void)();
+    const mockTimeout: NodeJS.Timeout = {
+      ref: () => mockTimeout,
+      unref: () => mockTimeout,
+      hasRef: () => true,
+      refresh: () => mockTimeout,
+      [Symbol.toPrimitive]: () => 0,
+      [Symbol.dispose]: () => {},
+    };
+    return mockTimeout;
+  });
+}
+
 describe("fetchNews", () => {
   it("should return empty array when URL returns 404", async () => {
     // Test with a URL that should return 404
@@ -183,22 +200,7 @@ describe("getRSSFeed", () => {
     // This simulates how rss-parser throws errors: just Error("Status code 429")
     const error429 = new Error("Status code 429");
 
-    // Mock setTimeout to avoid waiting
-    const setTimeoutSpy = jest
-      .spyOn(global, "setTimeout")
-      .mockImplementation((callback) => {
-        // Call callback immediately for test
-        (callback as () => void)();
-        const mockTimeout: NodeJS.Timeout = {
-          ref: () => mockTimeout,
-          unref: () => mockTimeout,
-          hasRef: () => true,
-          refresh: () => mockTimeout,
-          [Symbol.toPrimitive]: () => 0,
-          [Symbol.dispose]: () => {},
-        };
-        return mockTimeout;
-      });
+    const setTimeoutSpy = createMockSetTimeout();
 
     const mockParser = jest
       .spyOn(Parser.prototype, "parseURL")
@@ -219,22 +221,7 @@ describe("getRSSFeed", () => {
     // This simulates how rss-parser throws errors: just Error("Status code 429")
     const error429 = new Error("Status code 429");
 
-    // Mock setTimeout to avoid waiting
-    const setTimeoutSpy = jest
-      .spyOn(global, "setTimeout")
-      .mockImplementation((callback) => {
-        // Call callback immediately for test
-        (callback as () => void)();
-        const mockTimeout: NodeJS.Timeout = {
-          ref: () => mockTimeout,
-          unref: () => mockTimeout,
-          hasRef: () => true,
-          refresh: () => mockTimeout,
-          [Symbol.toPrimitive]: () => 0,
-          [Symbol.dispose]: () => {},
-        };
-        return mockTimeout;
-      });
+    const setTimeoutSpy = createMockSetTimeout();
 
     const mockParser = jest
       .spyOn(Parser.prototype, "parseURL")

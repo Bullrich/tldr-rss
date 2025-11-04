@@ -25,7 +25,6 @@ export const getRSSFeed = async (
       // Some libraries throw errors with a response object, others just with a message
       const errorWithResponse = error as {
         response?: { status?: number; headers?: Record<string, string> };
-        message?: string;
       };
       const is429Error =
         errorWithResponse?.response?.status === 429 ||
