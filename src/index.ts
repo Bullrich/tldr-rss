@@ -64,8 +64,8 @@ const fetchFeeds = async (): Promise<NewsWithDate[]> => {
 
     await writeRssFeed(feedName, feedNews);
 
-    // Generate HTML page for tech feed only
-    if (feedName === "tech") {
+    // Generate HTML page for tech, ai, and design feeds
+    if (feedName === "tech" || feedName === "ai" || feedName === "design") {
       await writeHtmlFeed(feedName, feedNews);
     }
 
@@ -75,6 +75,7 @@ const fetchFeeds = async (): Promise<NewsWithDate[]> => {
   logger.debug(`All news: ${JSON.stringify(dateWithNews)}`);
 
   await writeRssFeed("feed", dateWithNews);
+  await writeHtmlFeed("feed", dateWithNews);
   return dateWithNews;
 };
 
